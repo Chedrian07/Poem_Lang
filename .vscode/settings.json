@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.ino": "arduino",
+        "*.db": "sqlite",
+        "*.html": "php",
+        "*.php": "php",
+        "regex.h": "c"
+    }
+}
