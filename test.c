@@ -11,7 +11,6 @@ typedef struct{
 
 typedef struct{
     Line* lines;
-    char* context;
     int line_count;
 } Stanza;
 
@@ -22,32 +21,18 @@ typedef struct {
     int stanza_count;
 } Poem;
 
-Stanza* initStanza(Poem* poem, char* context, int cur){
-    poem->stanza_count = 1;
-    printf("%d\n", cur);
-    while (context[cur] == '\n' || context[cur] == ' ' || context[cur] == '\t'){
-        cur++;
-    }
-    int cnt = cur;
-    while (context[cur] != '\0'){
-        if (context[cur] == '\n' && context[cur+1] == '\n'){
-            poem->stanza_count++;
+Stanza* initStanza(char* context){
+    Stanza* stanza = (Stanza*)malloc(sizeof(Stanza));
+    stanza->lines = (Line*)malloc(sizeof(Line)*100);
+    stanza->line_count = 0;
+    int cnt = 0;
+
+    while(context[cnt] != '\0'){
+        if (context[cnt] == '\n' && context[cnt+1] == '\n'){
+            stanza->line_count++;
         }
-        cur++;
+        cnt++;
     }
-
-    printf("%d\n", poem->stanza_count);
-    Stanza* stanza[poem->stanza_count];
-
-    for (int i = 0; i < poem->stanza_count; i++){
-        stanza[i]->context = (char*)malloc(sizeof(char)*1000);
-        stanza[i]->line_count = 0;
-    }
-
-
-
-
-
 
     return stanza;
 }
@@ -56,7 +41,7 @@ Poem* initPoem(char* context){
     Poem* poem = (Poem*)malloc(sizeof(Poem));
     poem->title = (char*)malloc(sizeof(char)*100);
     int cur = 0;
-    while (context[cur] != '\n'){
+    while (context[cur] != '\n'){                                   
         poem->title[cur] = context[cur];
         cur++;
     }
@@ -75,7 +60,7 @@ Poem* initPoem(char* context){
     }
     poem->author[cur] = '\0';
     cur++;
-    poem->stanzas = initStanza(poem, context,cur);
+    poem->stanzas = initStanza(context+cur);
     return poem;
 }
 
@@ -120,13 +105,12 @@ int main(){
     Poem* poem = initPoem(context);
     puts(poem->title);
     puts(poem->author);
-    printf("%d\n", poem->stanza_count);
-    puts(poem->stanzas->lines[0].text);
+    printf("%d\n", poem->stanzas->line_count);  
 
+    
+    
 
-
-
-    return 0;
+    return 0;   
 
 
 }
