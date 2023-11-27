@@ -12,6 +12,21 @@ typedef struct{
     Line* lines;
     int line_count;
 } Stanza;
+Stanza* initStanza(char* context){
+    Stanza* stanza = (Stanza*)malloc(sizeof(Stanza));
+    stanza->lines = (Line*)malloc(sizeof(Line)*100);
+    stanza->line_count = 0;
+    int cnt = 0;
+
+    while(context[cnt] != '\0'){
+        if (context[cnt] == '\n'){
+            stanza->line_count++;
+        }
+        cnt++;
+    }
+
+    return stanza;
+}
 
 typedef struct {
     char* title;
@@ -39,6 +54,8 @@ Poem* initPoem(char* context){
     Stanza* stanzas = NULL;
     return poem;
 }
+
+
 
 char* ReadFile(char* filename) {
     FILE* rfile = fopen(filename, "r");
