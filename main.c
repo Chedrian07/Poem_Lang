@@ -36,20 +36,53 @@ Stanza* initStanza(Poem* poem, char* context, int cur){
         cur++;
     }
 
-    printf("%d\n", poem->stanza_count);
+    //Debugging 코드
+    printf("연의 갯수 : %d\n", poem->stanza_count);
+    puts("");
     Stanza* stanza[poem->stanza_count];
 
+    //Devide Stanza
     for (int i = 0; i < poem->stanza_count; i++){
-        stanza[i]->context = (char*)malloc(sizeof(char)*1000);
-        stanza[i]->line_count = 0;
+    stanza[i] = (Stanza*)malloc(sizeof(Stanza));
+    stanza[i]->context = (char*)malloc(sizeof(char)*1000);
+    if (stanza[i]->context == NULL) {
+        //Debugging Code
+        printf("%d Stanza is NULL !!\n",i);
     }
+    stanza[i]->line_count = 0;
+}
 
+    int stanza_cnt = 0;
+    int stanza_context_cnt = 0;
+    
+    while(context[cnt] != '\0'){
+    if(context[cnt] == '\n' && context[cnt+1] == '\n'){
+        stanza[stanza_cnt]->context[stanza_context_cnt] = '\0';
+        stanza_cnt ++;
+        stanza_context_cnt = 0;
+        stanza[stanza_cnt]->line_count = 0;
+    }else if(context[cnt] == '\n'){
+        stanza[stanza_cnt]->line_count++;
+    }else{
+        stanza[stanza_cnt]->context[stanza_context_cnt] = context[cnt];
+        stanza_context_cnt++;
+    }
+    cnt++;
+}
+stanza[stanza_cnt]->context[stanza_context_cnt] = '\0';
 
+//Debugging Code
+for(int i=0;i<poem->stanza_count;i++){
+    printf("stanza[i]의 줄 갯수: %d\n", stanza[i]->line_count);
+    for(int j=0;j<strlen(stanza[i]->context); j++){
+        if(stanza[i]->context[j] == '\n'){
+            printf("\n");
+        }
+        printf("%c", stanza[i]->context[j]);
+    }
+    printf("\n");
+}
 
-
-
-
-    return stanza;
 }
 
 Poem* initPoem(char* context){
@@ -78,9 +111,6 @@ Poem* initPoem(char* context){
     poem->stanzas = initStanza(poem, context,cur);
     return poem;
 }
-
-
-
 
 
 char* ReadFile(char* filename) {
@@ -121,10 +151,7 @@ int main(){
     puts(poem->title);
     puts(poem->author);
     printf("%d\n", poem->stanza_count);
-    puts(poem->stanzas->lines[0].text);
-
-
-
+    //puts(poem->stanzas->lines[0].text);
 
     return 0;
 
