@@ -66,8 +66,6 @@ char* ReadFile(char* filename) {
 
 
 
-
-
 int main(){
 
     printf("시 파일 경로 입력 <파일확장자:txt> : ");
