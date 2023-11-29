@@ -13,6 +13,7 @@ typedef struct{
     Line* lines;
     char* context;
     int line_count;
+    char *stanza_num;
 } Stanza;
 
 typedef struct {
@@ -54,7 +55,7 @@ Stanza* initStanza(Poem* poem, char* context, int cur){
 
     int stanza_cnt = 0;
     int stanza_context_cnt = 0;
-    
+
     while(context[cnt] != '\0'){
     if(context[cnt] == '\n' && context[cnt+1] == '\n'){
         stanza[stanza_cnt]->context[stanza_context_cnt] = '\0';
@@ -63,13 +64,14 @@ Stanza* initStanza(Poem* poem, char* context, int cur){
         stanza[stanza_cnt]->line_count = 0;
     }else if(context[cnt] == '\n'){
         stanza[stanza_cnt]->line_count++;
+        //stanza_num[stanza_cnt][stanza[stanza_cnt]->line_count] = context[cnt-1];
     }else{
         stanza[stanza_cnt]->context[stanza_context_cnt] = context[cnt];
         stanza_context_cnt++;
     }
     cnt++;
 }
-stanza[stanza_cnt]->context[stanza_context_cnt] = '\0';
+
 
 //Debugging Code
 for(int i=0;i<poem->stanza_count;i++){
@@ -83,7 +85,22 @@ for(int i=0;i<poem->stanza_count;i++){
     printf("\n");
 }
 
+//Save Stanza_Numbers (운율)
+for(int i=0;i<poem->stanza_count;i++){
+    stanza[i]->stanza_num = (char*)malloc(sizeof(char)*stanza[i]->line_count);
+    int stanza_num_cnt = 0;
+    for(int j=0;j<strlen(stanza[i]->context); j++){
+        if(stanza[i]->context[j] == '\n'){
+            stanza[i]->stanza_num[stanza_num_cnt] = stanza[i]->context[j-1];
+            printf("%c", stanza[i]->stanza_num[stanza_num_cnt]);
+            stanza_num_cnt++;
+        }
+    }
+
 }
+
+}
+
 
 Poem* initPoem(char* context){
     Poem* poem = (Poem*)malloc(sizeof(Poem));
@@ -135,7 +152,6 @@ char* ReadFile(char* filename) {
     fclose(rfile);
     return buffer;
 }
-
 
 
 
