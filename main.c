@@ -85,7 +85,7 @@ for(int i=0;i<poem->stanza_count;i++){
     printf("\n");
 }
 
-//Save Stanza_Numbers (운율)
+//Save Stanza_Numbers (운율) 어케 짜야될지 몰겠음..
 for(int i=0;i<poem->stanza_count;i++){
     stanza[i]->stanza_num = (char*)malloc(sizeof(char)*stanza[i]->line_count);
     int stanza_num_cnt = 0;
@@ -105,7 +105,7 @@ for(int i=0;i<poem->stanza_count;i++){
 Poem* initPoem(char* context){
     Poem* poem = (Poem*)malloc(sizeof(Poem));
     poem->title = (char*)malloc(sizeof(char)*100);
-    int cur = 0;
+    int cur = 0;s
     while (context[cur] != '\n'){
         poem->title[cur] = context[cur];
         cur++;
@@ -152,8 +152,6 @@ char* ReadFile(char* filename) {
     fclose(rfile);
     return buffer;
 }
-
-
 
 int main(){
 
