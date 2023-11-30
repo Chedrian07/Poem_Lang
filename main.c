@@ -23,7 +23,33 @@ typedef struct {
     int stanza_count;
 } Poem;
 
+Line* initLine(char* context, int line_count) {
+    if (line_count <= 0) {
+        return NULL;
+    }
+
+    Line* lines = (Line*)malloc(sizeof(Line) * line_count);
+
+    int cur = 0;
+    int line_num = 0;
+    int line_len = 0;
+
+    while (context[cur] != '\0') {
+        if (context[cur] == '\n') {
+            lines[line_num].text = (char*)malloc(sizeof(char) * line_len + 1);
+            lines[line_num].text_len = line_len;
+            line_num++;
+            line_len = 0;
+        } else {
+            line_len++;
+        }
+        cur++;
+    }
+
+}
+
 Stanza* initStanza(Poem* poem, char* context, int cur){
+    cur = 0;
     poem->stanza_count = 1;
     printf("%d\n", cur);
     while (context[cur] == '\n' || context[cur] == ' ' || context[cur] == '\t'){
@@ -33,6 +59,7 @@ Stanza* initStanza(Poem* poem, char* context, int cur){
     while (context[cur] != '\0'){
         if (context[cur] == '\n' && context[cur+1] == '\n'){
             poem->stanza_count++;
+            cur++;
         }
         cur++;
     }
@@ -57,75 +84,73 @@ Stanza* initStanza(Poem* poem, char* context, int cur){
     int stanza_context_cnt = 0;
 
     while(context[cnt] != '\0'){
-    if(context[cnt] == '\n' && context[cnt+1] == '\n'){
-        stanza[stanza_cnt]->context[stanza_context_cnt] = '\0';
-        stanza_cnt ++;
-        stanza_context_cnt = 0;
-        stanza[stanza_cnt]->line_count = 0;
-    }else if(context[cnt] == '\n'){
-        stanza[stanza_cnt]->line_count++;
-        //stanza_num[stanza_cnt][stanza[stanza_cnt]->line_count] = context[cnt-1];
-    }else{
-        stanza[stanza_cnt]->context[stanza_context_cnt] = context[cnt];
-        stanza_context_cnt++;
-    }
-    cnt++;
-}
-
-
-//Debugging Code
-for(int i=0;i<poem->stanza_count;i++){
-    printf("stanza[i]의 줄 갯수: %d\n", stanza[i]->line_count);
-    for(int j=0;j<strlen(stanza[i]->context); j++){
-        if(stanza[i]->context[j] == '\n'){
-            printf("\n");
+        if(context[cnt] == '\n' && context[cnt+1] == '\n'){
+            stanza[stanza_cnt]->context[stanza_context_cnt] = '\n';
+            stanza_cnt ++;
+            stanza_context_cnt = 0;
+            stanza[stanza_cnt]->line_count = 0;
+        }else if(context[cnt] == '\n'){
+            //printf("Line Changed\n");
+            //stanza[stanza_cnt]->context[stanza_context_cnt] = '\n';
+            stanza[stanza_cnt]->line_count++;
+            //stanza_num[stanza_cnt][stanza[stanza_cnt]->line_count] = context[cnt-1];
+        }else{
+            stanza[stanza_cnt]->context[stanza_context_cnt] = context[cnt];
+            stanza_context_cnt++;
         }
-        printf("%c", stanza[i]->context[j]);
-    }
-    printf("\n");
-}
+        cnt++;
 
-//Save Stanza_Numbers (운율) 어케 짜야될지 몰겠음..
-for(int i=0;i<poem->stanza_count;i++){
-    stanza[i]->stanza_num = (char*)malloc(sizeof(char)*stanza[i]->line_count);
-    int stanza_num_cnt = 0;
-    for(int j=0;j<strlen(stanza[i]->context); j++){
-        if(stanza[i]->context[j] == '\n'){
-            stanza[i]->stanza_num[stanza_num_cnt] = stanza[i]->context[j-1];
-            printf("%c", stanza[i]->stanza_num[stanza_num_cnt]);
-            stanza_num_cnt++;
-        }
     }
 
+    //Debugging Code
+    for(int i=0;i<poem->stanza_count;i++){
+        printf("stanza[%d]의 줄 갯수: %d\n",i, stanza[i]->line_count);
+        printf("%s", stanza[i]->context);
+        // for(int j=0;j<strlen(stanza[i]->context); j++){
+        // }
+        printf("\n");
+    }
+    return stanza;
 }
 
-}
 
 
-Poem* initPoem(char* context){
+
+Poem* initPoem(char* context) {
     Poem* poem = (Poem*)malloc(sizeof(Poem));
-    poem->title = (char*)malloc(sizeof(char)*100);
-    int cur = 0;s
-    while (context[cur] != '\n'){
+    poem->title = (char*)malloc(sizeof(char) * 100);
+    int cur = 0;
+    
+    while (context[cur] != '\n' && context[cur] != '\0') {
         poem->title[cur] = context[cur];
         cur++;
     }
     poem->title[cur] = '\0';
     cur++;
-    poem->author = (char*)malloc(sizeof(char)*100);
-    while (context[cur] == ' '|| context[cur] == '\n' || context[cur] == '\t'){
-        printf("%d, %x\n", cur, context[cur]);
+
+    poem->author = (char*)malloc(sizeof(char) * 100);
+    while (context[cur] == ' ' || context[cur] == '\n' || context[cur] == '\t') {
         cur++;
     }
+
     int author_cur = 0;
-    while (context[cur] != '\n'){
+    while (context[cur] != '\n' && context[cur] != '\0') {
         poem->author[author_cur] = context[cur];
         cur++;
         author_cur++;
     }
-    poem->author[cur] = '\0';
+    poem->author[author_cur] = '\0';
     cur++;
-    poem->stanzas = initStanza(poem, context,cur);
+
+    while (context[cur] == '\n') {
+        cur++;
+    }
+
+    //Debugging Code
+    puts(poem->title);
+    puts(poem->author);
+    poem->stanzas = initStanza(poem, context + cur, cur);
+
     return poem;
 }
 
@@ -148,7 +173,6 @@ char* ReadFile(char* filename) {
 
     fread(buffer, 1, length, rfile);
     buffer[length] = '\0';
-
     fclose(rfile);
     return buffer;
 }
@@ -165,7 +189,13 @@ int main(){
     puts(poem->title);
     puts(poem->author);
     printf("%d\n", poem->stanza_count);
-    //puts(poem->stanzas->lines[0].text);
+    
+    if (poem->stanzas != NULL) {
+        Line* lines = initLine(poem->stanzas->context, poem->stanzas->line_count);
+        for (int i = 0; i < poem->stanzas->line_count; i++) {
+            printf("%s\n", lines[i].text);
+        }
+    }
 
     return 0;
 
